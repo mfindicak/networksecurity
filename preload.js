@@ -2,7 +2,7 @@ require('isomorphic-fetch'); // or another library of choice.
 var Dropbox = require('dropbox').Dropbox;
 var dbx = new Dropbox({
   accessToken:
-    'sl.BEIa1vXEFy2M-xgtLEY2l2ztqrSXFKyOodsT7TualCy8jUfZR9GquHofalAVqoZ0fkOwFatzbuV2OQAxIhhkkF0T0GehJUNGwVSVAOrwvlwvSirm-QgK57VxeKcnXWnIxa4NJ4rWyvjv',
+    'sl.BELzAe-1ZDwB-6uPZ27Iq0kB3j-qUoeUONjEGQIB3-J18oGn-hLTPIirXEgpXX8vP2nxOUozrbvnKXjfsAT_bJ05vZPrkgspxM8ZwL9FLGzLnq5aaBLztpC2jhkbCegepU39L-e6m5eD',
 });
 dbx
   .filesListFolder({ path: '/Network Security' })
