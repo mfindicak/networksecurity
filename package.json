@@ -1,0 +1,27 @@
+{
+  "name": "dropbox-client-app",
+  "version": "1.0.0",
+  "description": "This app built for Computer and Network Security lesson.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mfindicak/networksecurity.git"
+  },
+  "author": "krallar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mfindicak/networksecurity/issues"
+  },
+  "homepage": "https://github.com/mfindicak/networksecurity#readme",
+  "devDependencies": {
+    "electron": "^17.1.2"
+  },
+  "dependencies": {
+    "dropbox": "^10.26.0",
+    "isomorphic-fetch": "^3.0.0"
+  }
+}
