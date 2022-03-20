@@ -1,6 +1,5 @@
 var dbx = new Dropbox.Dropbox({
-  accessToken:
-    'sl.BEI9GtbDVmPSwhybifwKUUaALIim8zl8Fq1wYulN0kR6lFY1ONwdKRwvZm6QjQNHpd0MLPZfz_BSrk30pKjCvxhfsR-uhbG28g8WFCcD7vHqKAnEDR0USZt4S8M_edngFzOSpwKqF9mz',
+  accessToken: token
 });
 
 const addElementToList = (listId, element) => {
