@@ -1,6 +1,6 @@
 var dbx = new Dropbox.Dropbox({
   accessToken:
-    'sl.BEKvMj4zyVQyQHJpErFSwGDKKZN-VqiRSBuhO-fyolO3-kYnRUjVX5nZMA_l3p9rBnNOtGsMevq9Voj-fCk6Xu0ihEDgFi5QJK_zIiGja-xRImYsTYIaYdo1YLXHcXl1Lp6W6kw9zcu5',
+    'sl.BEI9GtbDVmPSwhybifwKUUaALIim8zl8Fq1wYulN0kR6lFY1ONwdKRwvZm6QjQNHpd0MLPZfz_BSrk30pKjCvxhfsR-uhbG28g8WFCcD7vHqKAnEDR0USZt4S8M_edngFzOSpwKqF9mz',
 });
 
 const addElementToList = (listId, element) => {
