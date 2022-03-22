@@ -1,10 +1,5 @@
 const path = require('path');
-const http = require('http');
-const url = require('url');
 const { app, BrowserWindow } = require('electron');
-
-const { fork } = require('child_process');
-const ps = fork(`${__dirname}/server.js`);
 
 const createWindow = () => {
   const win = new BrowserWindow({
