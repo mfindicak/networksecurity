@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "dropbox": "^10.26.0",
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "node-static": "^0.7.11"
   }
 }
