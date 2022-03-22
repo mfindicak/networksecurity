@@ -3,7 +3,8 @@ const { app, BrowserWindow } = require('electron');
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 1200,
+    autoHideMenuBar: true,
+    width: 1100,
     height: 900,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

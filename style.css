@@ -36,8 +36,16 @@ li{
 
 }
 
-li::before{
+.file::before{
     content: "\f15b";
+    font: var(--fa-font-solid);
+    color: rgb(118, 181, 223);
+    font-size: 1.5rem;
+    margin-right: 0.7rem;
+}
+
+.folder::before{
+    content: "\f07b";
     font: var(--fa-font-solid);
     color: rgb(118, 181, 223);
     font-size: 1.5rem;

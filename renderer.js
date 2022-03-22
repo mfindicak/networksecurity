@@ -12,11 +12,15 @@ const addElementToList = (listId, element) => {
   li.appendChild(document.createTextNode(element.name));
   div.appendChild(li);
   var downloadButton = document.createElement("span");
-  if (element['.tag'] === 'file')
+  if (element['.tag'] === 'file') {
+    li.classList.add("file");
     downloadButton.addEventListener('click', () =>
       downloadFile(element.path_display, element.name)
     );
+  }
+
   else
+    li.classList.add("folder");
     downloadButton.addEventListener('click', () =>
       downloadFolder(element.path_display, element.name)
     );
@@ -52,9 +56,8 @@ function uploadFile() {
         var results = document.getElementById('results');
         var br = document.createElement('br');
         results.appendChild(document.createTextNode('Dosya Yüklendi!'));
-        setTimeout(()=>{location.reload();},1000);
+        setTimeout(() => { location.reload(); }, 1000);
         console.log(response);
-        
       })
       .catch(function (error) {
         console.error(error);
@@ -115,7 +118,8 @@ function uploadFile() {
     task
       .then(function (result) {
         var results = document.getElementById('results');
-        results.appendChild(document.createTextNode('File uploaded!'));
+        results.appendChild(document.createTextNode('Dosya Yüklendi!'));
+        setTimeout(() => { location.reload(); }, 1000);
       })
       .catch(function (error) {
         console.error(error);
@@ -174,4 +178,4 @@ var saveAsFile = function (fileName, fileContents) {
   }
 }; // saveAsFile
 
-window.onload = function(){getFileList('fileList','');}
+window.onload = function () { getFileList('fileList', ''); }
