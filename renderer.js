@@ -87,10 +87,7 @@ function uploadFile() {
         var results = document.getElementById('results');
         var br = document.createElement('br');
         results.appendChild(document.createTextNode('Dosya Yüklendi!'));
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
-        console.log(response);
+        getFileList('fileList', currentPath);
       })
       .catch(function (error) {
         console.error(error);
