@@ -1,6 +1,9 @@
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
 
+const { fork } = require('child_process')
+const ps = fork(`${__dirname}/server.js`)
+
 const createWindow = () => {
   const win = new BrowserWindow({
     autoHideMenuBar: true,
