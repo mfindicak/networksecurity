@@ -1,42 +1,8 @@
-var dbx = null;
-
-const appTokenUrl =
-  'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
-
-window.open(appTokenUrl, '_blank').focus();
+var dbx = new Dropbox.Dropbox({
+  accessToken: token,
+});
 
 var currentPath = '/';
-
-const getAccesToken = async () => {
-  var myHeaders = new Headers();
-  myHeaders.append(
-    'Authorization',
-    'Basic Mmg1bG5zZDg4NTJ6MXU5OnBxa2M1dnhweHZzcmJleg=='
-  );
-
-  var formdata = new FormData();
-  formdata.append('code', document.getElementById('tokenText').value);
-  formdata.append('grant_type', 'authorization_code');
-
-  var requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: formdata,
-    redirect: 'follow',
-  };
-
-  const response = await fetch(
-    'https://api.dropboxapi.com/oauth2/token',
-    requestOptions
-  ).then((response) => response.json());
-  console.log(response['access_token']);
-  dbx = new Dropbox.Dropbox({
-    accessToken: response['access_token'],
-  });
-  getFileList('fileList', '');
-  document.getElementById('tokenContainer').style = 'display:none';
-  return response['acces_token'];
-};
 
 const addElementToList = (listId, element) => {
   var ul = document.getElementById(listId);
@@ -45,16 +11,19 @@ const addElementToList = (listId, element) => {
   var div = document.createElement('div');
   li.appendChild(document.createTextNode(element.name));
   div.appendChild(li);
-  var downloadButton = document.createElement('span');
+  var downloadButton = document.createElement("span");
   if (element['.tag'] === 'file') {
-    li.classList.add('file');
+    li.classList.add("file");
     downloadButton.addEventListener('click', () =>
       downloadFile(element.path_display, element.name)
     );
-  } else li.classList.add('folder');
-  downloadButton.addEventListener('click', () =>
-    downloadFolder(element.path_display, element.name)
-  );
+  }
+
+  else
+    li.classList.add("folder");
+    downloadButton.addEventListener('click', () =>
+      downloadFolder(element.path_display, element.name)
+    );
   downloadButton.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i>';
   div.appendChild(downloadButton);
   ul.appendChild(div);
@@ -87,9 +56,7 @@ function uploadFile() {
         var results = document.getElementById('results');
         var br = document.createElement('br');
         results.appendChild(document.createTextNode('Dosya Yüklendi!'));
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        setTimeout(() => { location.reload(); }, 1000);
         console.log(response);
       })
       .catch(function (error) {
@@ -152,9 +119,7 @@ function uploadFile() {
       .then(function (result) {
         var results = document.getElementById('results');
         results.appendChild(document.createTextNode('Dosya Yüklendi!'));
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        setTimeout(() => { location.reload(); }, 1000);
       })
       .catch(function (error) {
         console.error(error);
@@ -213,6 +178,4 @@ var saveAsFile = function (fileName, fileContents) {
   }
 }; // saveAsFile
 
-// window.onload = function () {
-//   getFileList('fileList', '');
-// };
+window.onload = function () { getFileList('fileList', ''); }
