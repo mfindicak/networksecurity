@@ -5,19 +5,62 @@
     <script src="https://unpkg.com/dropbox@10.26.0/dist/Dropbox-sdk.min.js"></script>
     <script src="./token.js"></script>
     <script src="./renderer.js"></script>
-    <title>Hello World!</title>
+    <title>Güvenli Dropbox İstemcisi</title>
+
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+  
   </head>
-  <body>
+  <body class="bg-light">
+    <main role="main" class="container">
+      <div style="background-color:rgb(118, 181, 223);" class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded box-shadow">
 
-    <input type="file" id="file-upload" />
-    <button onclick="uploadFile()">Upload</button>
-    <h2 id="results"></h2>
+          <div class="lh-100">
+              <h6 class="mb-0 text-white lh-100">Güvenli Dropbox İstemcisi</h6>
 
-    <button onclick="getFileList('fileList','')">Get File List</button>
+          </div>
+      </div>
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+          <h5 class="border-bottom border-gray pb-2 mb-0">Dosya Yükleme</h5>
+          <div class="media text-muted pt-3 d-flex flex-column">
+          
+                  
 
-    <ol id="fileList">
+                      <div class="upload">
+                        <input type="file" id="file-upload" />
+                        <i onclick="uploadFile()" class="fa-solid fa-file-arrow-up"></i>
+                      </div>
+                       
+                        <p id="results" ></p>
+                  
+                 
 
-    </ol>
+                  
+              </div>
+          </div>
 
+          <div class="my-3 p-3 bg-white rounded box-shadow">
+            <h5 class="pb-0 mb-0">Dosya Listesi</h5>
+            <div>
+            <ul id="fileList">
+
+            </ul>
+            </div>
+            <small class="d-block text-right mt-3">
+                <a onclick="getFileList('fileList','')">Ana Dizin</a>
+              </small>
+        </div>
+
+
+
+    </main>
+
+   
+    
+
+    
+
+            
   </body>
 </html>

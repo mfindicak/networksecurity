@@ -11,7 +11,7 @@ const addElementToList = (listId, element) => {
   var div = document.createElement('div');
   li.appendChild(document.createTextNode(element.name));
   div.appendChild(li);
-  var downloadButton = document.createElement('button');
+  var downloadButton = document.createElement("span");
   if (element['.tag'] === 'file')
     downloadButton.addEventListener('click', () =>
       downloadFile(element.path_display, element.name)
@@ -20,9 +20,7 @@ const addElementToList = (listId, element) => {
     downloadButton.addEventListener('click', () =>
       downloadFolder(element.path_display, element.name)
     );
-  downloadButton.innerText = 'Download';
-  downloadButton.style = 'margin-left:10px';
-  div.style = 'display:flex;margin:5px';
+  downloadButton.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i>';
   div.appendChild(downloadButton);
   ul.appendChild(div);
 };
@@ -53,9 +51,10 @@ function uploadFile() {
       .then(function (response) {
         var results = document.getElementById('results');
         var br = document.createElement('br');
-        results.appendChild(document.createTextNode('File uploaded!'));
-        results.appendChild(br);
+        results.appendChild(document.createTextNode('Dosya Yüklendi!'));
+        setTimeout(()=>{location.reload();},1000);
         console.log(response);
+        
       })
       .catch(function (error) {
         console.error(error);
@@ -138,6 +137,7 @@ const getFileList = (listId, path) => {
     .then(function (response) {
       console.log(response);
       response.result.entries.forEach((element) => {
+        console.log(element['.tag']);
         addElementToList(listId, element);
       });
     })
@@ -173,3 +173,5 @@ var saveAsFile = function (fileName, fileContents) {
     pp.click();
   }
 }; // saveAsFile
+
+window.onload = function(){getFileList('fileList','');}
