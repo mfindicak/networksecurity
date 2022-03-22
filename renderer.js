@@ -118,7 +118,7 @@ function uploadFile() {
             .then((response) => response.session_id);
         });
       } else if (idx < items.length - 1) {
-        // Append part to the upload session
+        // Append part to the upload  session
         return acc.then(function (sessionId) {
           var cursor = { session_id: sessionId, offset: idx * maxBlob };
           return dbx
