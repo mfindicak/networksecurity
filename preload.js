@@ -1,3 +1,68 @@
+var crypto = require('crypto');
+var fs = require('fs');
+
+const generateKeys = () => {
+  crypto.generateKeyPair(
+    'rsa',
+    {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem',
+      },
+      privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+        cipher: 'aes-256-cbc',
+        passphrase: 'top secret',
+      },
+    },
+    (err, publicKey, privateKey) => {
+      // Handle errors and use the generated key pair.
+      fs.writeFileSync('privateKey.pem', privateKey);
+      fs.writeFileSync('publicKey.pem', publicKey);
+      //   const sifreli = encryptWithPublicKey('Ufuk harikasın');
+      //   console.log('Sifreli:' + sifreli);
+      //   const cozuldu = decryptWithPrivateKey(sifreli);
+      //   console.log('Cozuldu:' + cozuldu);
+    }
+  );
+};
+
+try {
+  if (fs.existsSync('./publicKey.pem') && fs.existsSync('./privateKey.pem')) {
+    console.log('Public ve Private Key Kayıtlı');
+  } else {
+    generateKeys();
+  }
+} catch (err) {
+  generateKeys();
+}
+
+const encryptWithPublicKey = (plainText) => {
+  return crypto.publicEncrypt(
+    {
+      key: fs.readFileSync('publicKey.pem', 'utf8'),
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: 'sha256',
+    },
+    // We convert the data string to a buffer
+    Buffer.from(plainText)
+  );
+};
+
+const decryptWithPrivateKey = (encryptedText) => {
+  return crypto.privateDecrypt(
+    {
+      key: fs.readFileSync('privateKey.pem', 'utf8'),
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: 'sha256',
+      passphrase: 'top secret',
+    },
+    encryptedText
+  );
+};
+
 // require('isomorphic-fetch'); // or another library of choice.
 // var Dropbox = require('dropbox').Dropbox;
 // var dbx = new Dropbox({

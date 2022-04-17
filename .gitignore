@@ -1,3 +1,5 @@
 /node_modules
 .DS_Store
 token.js
+publicKey.pem
+privateKey.pem
