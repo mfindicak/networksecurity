@@ -1,4 +1,5 @@
 var dbx = null;
+const key = 'asdf123';
 
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
@@ -6,6 +7,51 @@ const appTokenUrl =
 window.open(appTokenUrl, '_blank').focus();
 
 var currentPath = '/';
+
+function encrypt() {
+  var fileInput = document.getElementById('file-upload');
+  var file = fileInput.files[0];
+  var oldFileName = file.name;
+  var reader = new FileReader();
+  reader.onload = () => {
+    var wordArray = CryptoJS.lib.WordArray.create(reader.result);
+    var encrypted = CryptoJS.AES.encrypt(wordArray, key).toString();
+    var encryptedName = CryptoJS.AES.encrypt(oldFileName, key)
+      .toString()
+      .replaceAll('+', 'xMl3Jk')
+      .replaceAll('/', 'Por21Ld')
+      .replaceAll('=', 'Ml32');
+
+    var fileEnc = new Blob([encrypted]); // Create blob from string
+    fileEnc.name = encryptedName;
+    console.log(fileEnc);
+    uploadFile(fileEnc);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+const decrypt = (fileName, file) => {
+  var reader = new FileReader();
+  reader.onload = () => {
+    var decrypted = CryptoJS.AES.decrypt(reader.result, key);
+    fileName = fileName
+      .replaceAll('xMl3Jk', '+')
+      .replaceAll('Por21Ld', '/')
+      .replaceAll('Ml32', '=');
+    var decryptedName = CryptoJS.AES.decrypt(fileName, key).toString(
+      CryptoJS.enc.Utf8
+    );
+    console.log(decryptedName);
+    var typedArray = convertWordArrayToUint8Array(decrypted);
+
+    var fileDec = new Blob([typedArray]);
+    console.log(fileDec);
+
+    saveAsFile(decryptedName, fileDec);
+  };
+  console.log(file);
+  reader.readAsText(file);
+};
 
 const getAccesToken = async () => {
   var myHeaders = new Headers();
@@ -51,33 +97,34 @@ const addElementToList = (listId, element) => {
     downloadButton.addEventListener('click', () =>
       downloadFile(element.path_display, element.name)
     );
-  } else li.classList.add('folder');
-  downloadButton.addEventListener('click', () =>
-    downloadFolder(element.path_display, element.name)
-  );
+    div.appendChild(downloadButton);
+  } else {
+    li.classList.add('folder');
+    // downloadButton.addEventListener('click', () =>
+    //   downloadFolder(element.path_display, element.name)
+    // );
+  }
+
   downloadButton.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i>';
-  div.appendChild(downloadButton);
   ul.appendChild(div);
 };
 
 const downloadFile = (path, fileName) => {
   dbx.filesDownload({ path: path }).then((e) => {
-    saveAsFile(fileName, e.result.fileBlob);
+    decrypt(fileName, e.result.fileBlob);
   });
 };
 
-const downloadFolder = (path, fileName) => {
-  dbx.filesDownloadZip({ path: path }).then((e) => {
-    saveAsFile(fileName + '.zip', e.result.fileBlob);
-  });
-};
+// const downloadFolder = (path, fileName) => {
+//   dbx.filesDownloadZip({ path: path }).then((e) => {
+//     saveAsFile(fileName + '.zip', e.result.fileBlob);
+//   });
+// };
 
-function uploadFile() {
+function uploadFile(file) {
   var path = '/';
   if (currentPath && currentPath !== '') path = currentPath;
   const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
-  var fileInput = document.getElementById('file-upload');
-  var file = fileInput.files[0];
 
   if (file.size < UPLOAD_FILE_SIZE_LIMIT) {
     // File is smaller than 150 Mb - use filesUpload API
@@ -87,7 +134,7 @@ function uploadFile() {
         var results = document.getElementById('results');
         var br = document.createElement('br');
         results.appendChild(document.createTextNode('Dosya Yüklendi!'));
-        getFileList('fileList', currentPath);
+        getFileList('fileList', '');
       })
       .catch(function (error) {
         console.error(error);
@@ -213,3 +260,22 @@ var saveAsFile = function (fileName, fileContents) {
 // window.onload = function () {
 //   getFileList('fileList', '');
 // };
+
+const convertWordArrayToUint8Array = (wordArray) => {
+  var arrayOfWords = wordArray.hasOwnProperty('words') ? wordArray.words : [];
+  var length = wordArray.hasOwnProperty('sigBytes')
+    ? wordArray.sigBytes
+    : arrayOfWords.length * 4;
+  var uInt8Array = new Uint8Array(length),
+    index = 0,
+    word,
+    i;
+  for (i = 0; i < length; i++) {
+    word = arrayOfWords[i];
+    uInt8Array[index++] = word >> 24;
+    uInt8Array[index++] = (word >> 16) & 0xff;
+    uInt8Array[index++] = (word >> 8) & 0xff;
+    uInt8Array[index++] = word & 0xff;
+  }
+  return uInt8Array;
+};
