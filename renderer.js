@@ -1,6 +1,5 @@
 var dbx = null;
 const key = 'asdf123';
-
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
@@ -89,7 +88,20 @@ const addElementToList = (listId, element) => {
   var li = document.createElement('li');
   li.addEventListener('click', () => getFileList(listId, element.path_display));
   var div = document.createElement('div');
-  li.appendChild(document.createTextNode(element.name));
+
+  var fileName = element.name;
+  if (document.getElementById("myCheck").checked && element['.tag'] === 'file') {
+    fileName = fileName.replaceAll('xMl3Jk', '+').replaceAll('Por21Ld', '/').replaceAll('Ml32', '=');
+    fileName = CryptoJS.AES.decrypt(fileName, key).toString(CryptoJS.enc.Utf8);
+  }
+
+
+
+
+
+
+
+  li.appendChild(document.createTextNode(fileName));
   div.appendChild(li);
   var downloadButton = document.createElement('span');
   if (element['.tag'] === 'file') {
@@ -279,3 +291,44 @@ const convertWordArrayToUint8Array = (wordArray) => {
   }
   return uInt8Array;
 };
+
+
+const changedSwitch = () => {
+  const folders = document.getElementsByClassName("folder");
+  const files = document.getElementsByClassName("file");
+  if (document.getElementById("myCheck").checked) {
+    console.log("checked");
+    document.getElementById("encryptLabel").innerText = "Şifresiz";
+    /* for (let data of folders) {
+      var name = data.innerText;
+      name = name.replaceAll('xMl3Jk', '+')
+        .replaceAll('Por21Ld', '/')
+        .replaceAll('Ml32', '=');
+      var name = CryptoJS.AES.decrypt(name, key).toString(
+        CryptoJS.enc.Utf8);
+      data.innerText = name;
+    } */
+    for (let data of files) {
+      var name = data.innerText;
+      name = name.replaceAll('xMl3Jk', '+')
+        .replaceAll('Por21Ld', '/')
+        .replaceAll('Ml32', '=');
+      var name = CryptoJS.AES.decrypt(name, key).toString(
+        CryptoJS.enc.Utf8);
+      data.innerText = name;
+    }
+  }
+  else {
+    console.log("no checked");
+    document.getElementById("encryptLabel").innerText = "Şifreli";
+    for (let data of files) {
+      var name = data.innerText;
+      console.log(name);
+      var name = CryptoJS.AES.encrypt(name, key).toString().replaceAll('+', 'xMl3Jk')
+        .replaceAll('/', 'Por21Ld')
+        .replaceAll('=', 'Ml32');
+      console.log(name);
+      data.innerText = name;
+    }
+  }
+}
