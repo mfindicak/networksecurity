@@ -2,6 +2,12 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <script>
+      window.api.receive('fromMain', (data) => {
+        console.log(`Received ${data} from main process`);
+      });
+      window.api.send('toMain', 'test.json');
+    </script>
     <script type="module" src="./firebaseData.js"></script>
     <script src="https://unpkg.com/dropbox@10.26.0/dist/Dropbox-sdk.min.js"></script>
     <script

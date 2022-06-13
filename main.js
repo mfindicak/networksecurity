@@ -1,23 +1,38 @@
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { app, BrowserWindow } = require('electron');
+const fs = require('fs');
 
-const createWindow = () => {
-  const win = new BrowserWindow({
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let win;
+
+async function createWindow() {
+  // Create the browser window.
+  win = new BrowserWindow({
     autoHideMenuBar: true,
     width: 1100,
     height: 900,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: false, // turn off remote
+      preload: path.join(__dirname, 'preload.js'), // use a preload script
     },
   });
 
-  win.loadFile('index.html');
-};
+  // Load app
+  win.loadFile(path.join(__dirname, 'index.html'));
 
-app.whenReady().then(() => {
-  createWindow();
+  // rest of code..
+}
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+app.on('ready', createWindow);
+
+ipcMain.on('toMain', (event, args) => {
+  fs.readFile(args, (error, data) => {
+    // Do something with file contents
+
+    // Send result back to renderer process
+    win.webContents.send('fromMain', data);
   });
 });
