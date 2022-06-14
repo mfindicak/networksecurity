@@ -23,10 +23,12 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-window.addEmail = async (email) => {
+window.addEmail = async (email, publicKey, privateKey) => {
   try {
     const docRef = await addDoc(collection(db, 'emails'), {
       email: email,
+      publicKey: publicKey,
+      privateKey: privateKey,
     });
     console.log('Document written with ID: ', docRef.id);
   } catch (e) {

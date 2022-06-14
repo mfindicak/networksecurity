@@ -66,7 +66,7 @@ const getAccesToken = async (lastAccesToken = null) => {
 
   dbx.usersGetCurrentAccount().then((e) => {
     currentMail = e.result.email;
-    addEmail(currentMail);
+    addEmail(currentMail, thePublicKey, thePrivateKey);
   });
 
   getFileList('fileList', '');

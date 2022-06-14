@@ -4,21 +4,31 @@
     <meta charset="UTF-8" />
     <script>
       let accesToken = null;
+      let thePublicKey = null;
+      let thePrivateKey = null;
       window.api.receive('fromMain', (data) => {
         console.log(`Received ${JSON.stringify(data)} from main process`);
         if (data.function === 'getAccesToken') {
           accesToken = JSON.parse(data.data).accesToken;
           console.log(accesToken);
         }
+        if (data.function === 'getPublicKey') {
+          thePublicKey = data.data;
+          console.log(thePublicKey);
+        }
+        if (data.function === 'getPrivateKey') {
+          thePrivateKey = data.data;
+          console.log(thePrivateKey);
+        }
       });
-      // window.api.send('toMain', {
-      //   function: 'getPublicKey',
-      // });
-      // window.api.send('toMain', {
-      //   function: 'getPrivateKey',
-      // });
       window.api.send('toMain', {
         function: 'getAccesToken',
+      });
+      window.api.send('toMain', {
+        function: 'getPublicKey',
+      });
+      window.api.send('toMain', {
+        function: 'getPrivateKey',
       });
     </script>
     <script type="module" src="./firebaseData.js"></script>
