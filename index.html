@@ -11,16 +11,12 @@
           console.log(accesToken);
         }
       });
-      window.api.send('toMain', {
-        function: 'readFile',
-        fileName: 'test.json',
-      });
-      window.api.send('toMain', {
-        function: 'getPublicKey',
-      });
-      window.api.send('toMain', {
-        function: 'getPrivateKey',
-      });
+      // window.api.send('toMain', {
+      //   function: 'getPublicKey',
+      // });
+      // window.api.send('toMain', {
+      //   function: 'getPrivateKey',
+      // });
       window.api.send('toMain', {
         function: 'getAccesToken',
       });

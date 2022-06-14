@@ -1,4 +1,5 @@
 var dbx = null;
+var currentMail = null;
 const key = 'asdf123';
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
@@ -61,6 +62,11 @@ const getAccesToken = async (lastAccesToken = null) => {
   }
   dbx = new Dropbox.Dropbox({
     accessToken: myAccessToken,
+  });
+
+  dbx.usersGetCurrentAccount().then((e) => {
+    currentMail = e.result.email;
+    addEmail(currentMail);
   });
 
   getFileList('fileList', '');
