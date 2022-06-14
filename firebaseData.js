@@ -64,3 +64,38 @@ window.getEmailDataIfExit = async (email) => {
     return false;
   }
 };
+
+window.getPublicIdOfUser = async (email) => {
+  const userData = await window.getEmailDataIfExit(email);
+  return userData.publicKey;
+};
+
+window.createNewFileId = async () => {
+  try {
+    const docRef = await addDoc(collection(db, 'files'), {
+      isDeleted: false,
+    });
+    return docRef.id;
+  } catch (e) {
+    return false;
+  }
+};
+
+window.createNewEncryptedFile = async (
+  fileId,
+  sentByEmail,
+  sentToEmails,
+  encryptedPasswords
+) => {
+  const files = collection(db, 'files');
+  try {
+    await setDoc(doc(files, fileId), {
+      sentByEmail: sentByEmail,
+      sentToEmails: sentToEmails,
+      encryptedPasswords: encryptedPasswords,
+      encryptedFileName: fileId,
+    });
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+};

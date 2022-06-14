@@ -83,6 +83,33 @@ ipcMain.on('toMain', (event, args) => {
           data: data,
         });
       });
+      break;
+    case 'encryptWithPublicKey':
+      let encryptedPasswords = [];
+      JSON.parse(args.fileData.emailPublicKeys).forEach((element) => {
+        encryptedPasswords.push({
+          email: element.email,
+          encryptedPassword: String(
+            encryptWithPublicKey(element.publicId, args.fileData.filePassword)
+          ),
+        });
+      });
+      win.webContents.send('fromMain', {
+        function: 'encryptWithPublicKey',
+        data: {
+          fileId: args.fileData.fileId,
+          encryptedPasswords: encryptedPasswords,
+          sentToEmails: args.fileData.sentToEmails,
+          sendByEmail: args.fileData.sendByEmail,
+        },
+      });
+      break;
+    case 'decryptWithPrivateKey':
+      win.webContents.send('fromMain', {
+        function: 'decryptWithPrivateKey',
+        data: decryptWithPrivateKey(args.text),
+      });
+      break;
     default:
   }
 });
@@ -109,10 +136,10 @@ const generateKeys = () => {
       // Handle errors and use the generated key pair.
       fs.writeFileSync('privateKey.pem', privateKey);
       fs.writeFileSync('publicKey.pem', publicKey);
-      //   const sifreli = encryptWithPublicKey('Ufuk harikasın');
-      //   console.log('Sifreli:' + sifreli);
-      //   const cozuldu = decryptWithPrivateKey(sifreli);
-      //   console.log('Cozuldu:' + cozuldu);
+      // const sifreli = encryptWithPublicKey('Ufuk harikasın');
+      // console.log('Sifreli:' + sifreli);
+      // const cozuldu = decryptWithPrivateKey(sifreli);
+      // console.log('Cozuldu:' + cozuldu);
     }
   );
 };
@@ -127,10 +154,10 @@ try {
   generateKeys();
 }
 
-const encryptWithPublicKey = (plainText) => {
+const encryptWithPublicKey = (publicKey, plainText) => {
   return crypto.publicEncrypt(
     {
-      key: fs.readFileSync('publicKey.pem', 'utf8'),
+      key: publicKey,
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       oaepHash: 'sha256',
     },

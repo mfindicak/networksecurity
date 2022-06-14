@@ -2,6 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <script type="module" src="./firebaseData.js"></script>
+    <script>
+      function generateRandomPassword() {
+        var length = 8,
+          charset =
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+          retVal = '';
+        for (var i = 0, n = charset.length; i < length; ++i) {
+          retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return retVal;
+      }
+    </script>
     <script>
       let accesToken = null;
       let thePublicKey = null;
@@ -18,6 +31,16 @@
         if (data.function === 'getPrivateKey') {
           thePrivateKey = data.data;
         }
+        if (data.function === 'encryptWithPublicKey') {
+          const lastFileData = data.data;
+          console.log('File Data:' + JSON.stringify(lastFileData));
+          window.createNewEncryptedFile(
+            lastFileData.fileId,
+            lastFileData.sendByEmail,
+            lastFileData.sentToEmails,
+            lastFileData.encryptedPasswords
+          );
+        }
       });
       window.api.send('toMain', {
         function: 'getAccesToken',
@@ -29,7 +52,7 @@
         function: 'getPrivateKey',
       });
     </script>
-    <script type="module" src="./firebaseData.js"></script>
+
     <script src="https://unpkg.com/dropbox@10.26.0/dist/Dropbox-sdk.min.js"></script>
     <script
       type="text/javascript"
@@ -126,7 +149,7 @@
       <div class="media text-muted pt-3 d-flex flex-column">
         <div class="upload">
           <input type="file" id="file-upload" />
-          <i onclick="encrypt()" class="fa-solid fa-file-arrow-up"></i>
+          <i onclick="fileUpload()" class="fa-solid fa-file-arrow-up"></i>
         </div>
 
         <p id="results"></p>

@@ -4,6 +4,28 @@ const key = 'asdf123';
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
+const fileUpload = async () => {
+  let emailPublicKeys = [];
+  const fileId = await window.createNewFileId();
+  const filePassword = generateRandomPassword();
+  const sentToEmails = [currentMail]; //Su an icin yalnizca kendimle paylasicam
+  for (let index = 0; index < sentToEmails.length; index++) {
+    const element = sentToEmails[index];
+    let userPublicId = await window.getPublicIdOfUser(element);
+    emailPublicKeys.push({ email: element, publicId: userPublicId });
+  }
+  window.api.send('toMain', {
+    function: 'encryptWithPublicKey',
+    fileData: {
+      fileId: fileId,
+      filePassword: filePassword,
+      sentToEmails: sentToEmails,
+      emailPublicKeys: JSON.stringify(emailPublicKeys),
+      sendByEmail: currentMail,
+    },
+  });
+};
+
 const clearTheList = (listId) => {
   const ourList = document.getElementById(listId);
   ourList.innerHTML = '';
