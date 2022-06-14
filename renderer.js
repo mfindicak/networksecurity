@@ -15,9 +15,9 @@ const getFileList = (listId, path) => {
   dbx
     .filesListFolder({ path: path })
     .then(function (response) {
-      console.log(response);
+      //console.log(response);
       response.result.entries.forEach((element) => {
-        console.log(element['.tag']);
+        //console.log(element['.tag']);
         addElementToList(listId, element);
       });
     })

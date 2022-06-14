@@ -10,15 +10,13 @@
         console.log(`Received ${JSON.stringify(data)} from main process`);
         if (data.function === 'getAccesToken') {
           accesToken = JSON.parse(data.data).accesToken;
-          console.log(accesToken);
+          console.log('My Acces Token: ' + accesToken);
         }
         if (data.function === 'getPublicKey') {
           thePublicKey = data.data;
-          console.log(thePublicKey);
         }
         if (data.function === 'getPrivateKey') {
           thePrivateKey = data.data;
-          console.log(thePrivateKey);
         }
       });
       window.api.send('toMain', {
