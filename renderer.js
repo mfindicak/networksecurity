@@ -3,7 +3,78 @@ const key = 'asdf123';
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
-window.open(appTokenUrl, '_blank').focus();
+const clearTheList = (listId) => {
+  const ourList = document.getElementById(listId);
+  ourList.innerHTML = '';
+};
+
+const getFileList = (listId, path) => {
+  clearTheList(listId);
+  currentPath = path + '/';
+  dbx
+    .filesListFolder({ path: path })
+    .then(function (response) {
+      console.log(response);
+      response.result.entries.forEach((element) => {
+        console.log(element['.tag']);
+        addElementToList(listId, element);
+      });
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
+const getAccesToken = async (lastAccesToken = null) => {
+  let myAccessToken = null;
+  if (lastAccesToken == null) {
+    var myHeaders = new Headers();
+    myHeaders.append(
+      'Authorization',
+      'Basic Mmg1bG5zZDg4NTJ6MXU5OnBxa2M1dnhweHZzcmJleg=='
+    );
+
+    var formdata = new FormData();
+    formdata.append('code', document.getElementById('tokenText').value);
+    formdata.append('grant_type', 'authorization_code');
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: formdata,
+      redirect: 'follow',
+    };
+
+    const response = await fetch(
+      'https://api.dropboxapi.com/oauth2/token',
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((response) => (myAccessToken = response['access_token']));
+
+    window.api.send('toMain', {
+      function: 'saveAccesToken',
+      accesToken: myAccessToken,
+    });
+  } else {
+    myAccessToken = lastAccesToken;
+  }
+  dbx = new Dropbox.Dropbox({
+    accessToken: myAccessToken,
+  });
+
+  getFileList('fileList', '');
+  document.getElementById('tokenContainer').style = 'display:none';
+  return myAccessToken;
+};
+
+$(document).ready(function () {
+  if (accesToken === null) {
+    window.open(appTokenUrl, '_blank').focus();
+  } else {
+    getAccesToken(accesToken);
+  }
+});
 
 var currentPath = '/';
 
@@ -52,37 +123,6 @@ const decrypt = (fileName, file) => {
   reader.readAsText(file);
 };
 
-const getAccesToken = async () => {
-  var myHeaders = new Headers();
-  myHeaders.append(
-    'Authorization',
-    'Basic Mmg1bG5zZDg4NTJ6MXU5OnBxa2M1dnhweHZzcmJleg=='
-  );
-
-  var formdata = new FormData();
-  formdata.append('code', document.getElementById('tokenText').value);
-  formdata.append('grant_type', 'authorization_code');
-
-  var requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: formdata,
-    redirect: 'follow',
-  };
-
-  const response = await fetch(
-    'https://api.dropboxapi.com/oauth2/token',
-    requestOptions
-  ).then((response) => response.json());
-  console.log(response['access_token']);
-  dbx = new Dropbox.Dropbox({
-    accessToken: response['access_token'],
-  });
-  getFileList('fileList', '');
-  document.getElementById('tokenContainer').style = 'display:none';
-  return response['acces_token'];
-};
-
 const addElementToList = (listId, element) => {
   var ul = document.getElementById(listId);
   var li = document.createElement('li');
@@ -90,16 +130,16 @@ const addElementToList = (listId, element) => {
   var div = document.createElement('div');
 
   var fileName = element.name;
-  if (document.getElementById("myCheck").checked && element['.tag'] === 'file') {
-    fileName = fileName.replaceAll('xMl3Jk', '+').replaceAll('Por21Ld', '/').replaceAll('Ml32', '=');
+  if (
+    document.getElementById('myCheck').checked &&
+    element['.tag'] === 'file'
+  ) {
+    fileName = fileName
+      .replaceAll('xMl3Jk', '+')
+      .replaceAll('Por21Ld', '/')
+      .replaceAll('Ml32', '=');
     fileName = CryptoJS.AES.decrypt(fileName, key).toString(CryptoJS.enc.Utf8);
   }
-
-
-
-
-
-
 
   li.appendChild(document.createTextNode(fileName));
   div.appendChild(li);
@@ -219,28 +259,6 @@ function uploadFile(file) {
   return false;
 }
 
-const clearTheList = (listId) => {
-  const ourList = document.getElementById(listId);
-  ourList.innerHTML = '';
-};
-
-const getFileList = (listId, path) => {
-  clearTheList(listId);
-  currentPath = path + '/';
-  dbx
-    .filesListFolder({ path: path })
-    .then(function (response) {
-      console.log(response);
-      response.result.entries.forEach((element) => {
-        console.log(element['.tag']);
-        addElementToList(listId, element);
-      });
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-};
-
 var saveAsFile = function (fileName, fileContents) {
   if (typeof Blob != 'undefined') {
     // Alternative 1: using Blob
@@ -292,13 +310,12 @@ const convertWordArrayToUint8Array = (wordArray) => {
   return uInt8Array;
 };
 
-
 const changedSwitch = () => {
-  const folders = document.getElementsByClassName("folder");
-  const files = document.getElementsByClassName("file");
-  if (document.getElementById("myCheck").checked) {
-    console.log("checked");
-    document.getElementById("encryptLabel").innerText = "Şifresiz";
+  const folders = document.getElementsByClassName('folder');
+  const files = document.getElementsByClassName('file');
+  if (document.getElementById('myCheck').checked) {
+    console.log('checked');
+    document.getElementById('encryptLabel').innerText = 'Şifresiz';
     /* for (let data of folders) {
       var name = data.innerText;
       name = name.replaceAll('xMl3Jk', '+')
@@ -310,25 +327,26 @@ const changedSwitch = () => {
     } */
     for (let data of files) {
       var name = data.innerText;
-      name = name.replaceAll('xMl3Jk', '+')
+      name = name
+        .replaceAll('xMl3Jk', '+')
         .replaceAll('Por21Ld', '/')
         .replaceAll('Ml32', '=');
-      var name = CryptoJS.AES.decrypt(name, key).toString(
-        CryptoJS.enc.Utf8);
+      var name = CryptoJS.AES.decrypt(name, key).toString(CryptoJS.enc.Utf8);
       data.innerText = name;
     }
-  }
-  else {
-    console.log("no checked");
-    document.getElementById("encryptLabel").innerText = "Şifreli";
+  } else {
+    console.log('no checked');
+    document.getElementById('encryptLabel').innerText = 'Şifreli';
     for (let data of files) {
       var name = data.innerText;
       console.log(name);
-      var name = CryptoJS.AES.encrypt(name, key).toString().replaceAll('+', 'xMl3Jk')
+      var name = CryptoJS.AES.encrypt(name, key)
+        .toString()
+        .replaceAll('+', 'xMl3Jk')
         .replaceAll('/', 'Por21Ld')
         .replaceAll('=', 'Ml32');
       console.log(name);
       data.innerText = name;
     }
   }
-}
+};

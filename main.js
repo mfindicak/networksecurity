@@ -64,6 +64,25 @@ ipcMain.on('toMain', (event, args) => {
         });
       });
       break;
+    case 'saveAccesToken':
+      fs.writeFile(
+        'accesToken.json',
+        JSON.stringify({ accesToken: args.accesToken }),
+        'utf8',
+        function (err) {
+          if (err) return console.log(err);
+          console.log('Hello World > helloworld.txt');
+        }
+      );
+      break;
+    case 'getAccesToken':
+      fs.readFile('accesToken.json', 'utf8', (error, data) => {
+        // Send result back to renderer process
+        win.webContents.send('fromMain', {
+          function: 'getAccesToken',
+          data: data,
+        });
+      });
     default:
   }
 });

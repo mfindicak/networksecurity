@@ -3,8 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <script>
+      let accesToken = null;
       window.api.receive('fromMain', (data) => {
         console.log(`Received ${JSON.stringify(data)} from main process`);
+        if (data.function === 'getAccesToken') {
+          accesToken = JSON.parse(data.data).accesToken;
+          console.log(accesToken);
+        }
       });
       window.api.send('toMain', {
         function: 'readFile',
@@ -16,6 +21,9 @@
       window.api.send('toMain', {
         function: 'getPrivateKey',
       });
+      window.api.send('toMain', {
+        function: 'getAccesToken',
+      });
     </script>
     <script type="module" src="./firebaseData.js"></script>
     <script src="https://unpkg.com/dropbox@10.26.0/dist/Dropbox-sdk.min.js"></script>
@@ -24,7 +32,6 @@
       src="./bower_components/crypto-js/crypto-js.js"
     ></script>
     <script src="./token.js"></script>
-    <script src="./renderer.js"></script>
     <title>Güvenli Dropbox İstemcisi</title>
 
     <link
@@ -60,7 +67,9 @@
 
     <script>
       $(document).ready(function () {
-        $('#exampleModal').modal('show');
+        if (accesToken === null) {
+          $('#exampleModal').modal('show');
+        }
       });
     </script>
     <script type="text/javascript">
@@ -68,6 +77,7 @@
         $('#exampleModal').modal('hide');
       }
     </script>
+    <script src="./renderer.js"></script>
   </head>
 
   <body class="bg-light">
