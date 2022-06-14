@@ -32,13 +32,17 @@
           thePrivateKey = data.data;
         }
         if (data.function === 'encryptWithPublicKey') {
+          var fileInput = document.getElementById('file-upload');
+          var file = fileInput.files[0];
+          var oldFileName = file.name;
           const lastFileData = data.data;
           console.log('File Data:' + JSON.stringify(lastFileData));
           window.createNewEncryptedFile(
             lastFileData.fileId,
             lastFileData.sendByEmail,
             lastFileData.sentToEmails,
-            lastFileData.encryptedPasswords
+            lastFileData.encryptedPasswords,
+            oldFileName
           );
         }
       });

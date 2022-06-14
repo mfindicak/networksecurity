@@ -85,15 +85,17 @@ window.createNewEncryptedFile = async (
   fileId,
   sentByEmail,
   sentToEmails,
-  encryptedPasswords
+  encryptedPasswords,
+  oldFileName
 ) => {
   const files = collection(db, 'files');
   try {
     await setDoc(doc(files, fileId), {
+      fileId: fileId,
+      oldFileName: oldFileName,
       sentByEmail: sentByEmail,
       sentToEmails: sentToEmails,
       encryptedPasswords: encryptedPasswords,
-      encryptedFileName: fileId,
     });
   } catch (e) {
     console.error('Error adding document: ', e);
