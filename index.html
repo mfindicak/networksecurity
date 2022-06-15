@@ -15,47 +15,6 @@
         return retVal;
       }
     </script>
-    <script>
-      let accesToken = null;
-      let thePublicKey = null;
-      let thePrivateKey = null;
-      window.api.receive('fromMain', (data) => {
-        console.log(`Received ${JSON.stringify(data)} from main process`);
-        if (data.function === 'getAccesToken') {
-          accesToken = JSON.parse(data.data).accesToken;
-          console.log('My Acces Token: ' + accesToken);
-        }
-        if (data.function === 'getPublicKey') {
-          thePublicKey = data.data;
-        }
-        if (data.function === 'getPrivateKey') {
-          thePrivateKey = data.data;
-        }
-        if (data.function === 'encryptWithPublicKey') {
-          var fileInput = document.getElementById('file-upload');
-          var file = fileInput.files[0];
-          var oldFileName = file.name;
-          const lastFileData = data.data;
-          console.log('File Data:' + JSON.stringify(lastFileData));
-          window.createNewEncryptedFile(
-            lastFileData.fileId,
-            lastFileData.sendByEmail,
-            lastFileData.sentToEmails,
-            lastFileData.encryptedPasswords,
-            oldFileName
-          );
-        }
-      });
-      window.api.send('toMain', {
-        function: 'getAccesToken',
-      });
-      window.api.send('toMain', {
-        function: 'getPublicKey',
-      });
-      window.api.send('toMain', {
-        function: 'getPrivateKey',
-      });
-    </script>
 
     <script src="https://unpkg.com/dropbox@10.26.0/dist/Dropbox-sdk.min.js"></script>
     <script
@@ -109,6 +68,48 @@
       }
     </script>
     <script src="./renderer.js"></script>
+    <script>
+      let accesToken = null;
+      let thePublicKey = null;
+      let thePrivateKey = null;
+      window.api.receive('fromMain', (data) => {
+        console.log(`Received ${JSON.stringify(data)} from main process`);
+        if (data.function === 'getAccesToken') {
+          accesToken = JSON.parse(data.data).accesToken;
+          console.log('My Acces Token: ' + accesToken);
+        }
+        if (data.function === 'getPublicKey') {
+          thePublicKey = data.data;
+        }
+        if (data.function === 'getPrivateKey') {
+          thePrivateKey = data.data;
+        }
+        if (data.function === 'encryptWithPublicKey') {
+          var fileInput = document.getElementById('file-upload');
+          var file = fileInput.files[0];
+          var oldFileName = file.name;
+          const lastFileData = data.data;
+          console.log('File Data:' + JSON.stringify(lastFileData));
+          window.createNewEncryptedFile(
+            lastFileData.fileId,
+            lastFileData.sendByEmail,
+            lastFileData.sentToEmails,
+            lastFileData.encryptedPasswords,
+            oldFileName
+          );
+          encryptAndUploadFile(lastFileData.filePassword, lastFileData.fileId);
+        }
+      });
+      window.api.send('toMain', {
+        function: 'getAccesToken',
+      });
+      window.api.send('toMain', {
+        function: 'getPublicKey',
+      });
+      window.api.send('toMain', {
+        function: 'getPrivateKey',
+      });
+    </script>
   </head>
 
   <body class="bg-light">
@@ -153,7 +154,7 @@
       <div class="media text-muted pt-3 d-flex flex-column">
         <div class="upload">
           <input type="file" id="file-upload" />
-          <i onclick="fileUpload()" class="fa-solid fa-file-arrow-up"></i>
+          <i onclick="fileSelected()" class="fa-solid fa-file-arrow-up"></i>
         </div>
 
         <p id="results"></p>

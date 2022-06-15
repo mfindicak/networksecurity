@@ -1,10 +1,9 @@
 var dbx = null;
 var currentMail = null;
-const key = 'asdf123';
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
-const fileUpload = async () => {
+const fileSelected = async () => {
   let emailPublicKeys = [];
   const fileId = await window.createNewFileId();
   const filePassword = generateRandomPassword();
@@ -106,19 +105,13 @@ $(document).ready(function () {
 
 var currentPath = '/';
 
-function encrypt() {
+const encryptAndUploadFile = (key, encryptedName) => {
   var fileInput = document.getElementById('file-upload');
   var file = fileInput.files[0];
-  var oldFileName = file.name;
   var reader = new FileReader();
   reader.onload = () => {
     var wordArray = CryptoJS.lib.WordArray.create(reader.result);
     var encrypted = CryptoJS.AES.encrypt(wordArray, key).toString();
-    var encryptedName = CryptoJS.AES.encrypt(oldFileName, key)
-      .toString()
-      .replaceAll('+', 'xMl3Jk')
-      .replaceAll('/', 'Por21Ld')
-      .replaceAll('=', 'Ml32');
 
     var fileEnc = new Blob([encrypted]); // Create blob from string
     fileEnc.name = encryptedName;
@@ -126,7 +119,7 @@ function encrypt() {
     uploadFile(fileEnc);
   };
   reader.readAsArrayBuffer(file);
-}
+};
 
 const decrypt = (fileName, file) => {
   var reader = new FileReader();

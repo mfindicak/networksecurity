@@ -101,6 +101,7 @@ ipcMain.on('toMain', (event, args) => {
           encryptedPasswords: encryptedPasswords,
           sentToEmails: args.fileData.sentToEmails,
           sendByEmail: args.fileData.sendByEmail,
+          filePassword: args.fileData.filePassword,
         },
       });
       break;
