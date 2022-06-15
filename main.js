@@ -89,9 +89,10 @@ ipcMain.on('toMain', (event, args) => {
       JSON.parse(args.fileData.emailPublicKeys).forEach((element) => {
         encryptedPasswords.push({
           email: element.email,
-          encryptedPassword: String(
-            encryptWithPublicKey(element.publicId, args.fileData.filePassword)
-          ),
+          encryptedPassword: encryptWithPublicKey(
+            element.publicId,
+            args.fileData.filePassword
+          ).toJSON(),
         });
       });
       win.webContents.send('fromMain', {
@@ -108,7 +109,14 @@ ipcMain.on('toMain', (event, args) => {
     case 'decryptWithPrivateKey':
       win.webContents.send('fromMain', {
         function: 'decryptWithPrivateKey',
-        data: decryptWithPrivateKey(args.text),
+        data: {
+          fileId: args.fileData.fileId,
+          fileUrl: args.fileData.fileUrl,
+          oldFileName: args.fileData.oldFileName,
+          fileKey: String(
+            decryptWithPrivateKey(Buffer.from(args.fileData.filePassword))
+          ),
+        },
       });
       break;
     default:

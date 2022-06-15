@@ -101,3 +101,16 @@ window.createNewEncryptedFile = async (
     console.error('Error adding document: ', e);
   }
 };
+
+window.getFileDataIfExit = async (fileId) => {
+  const docRef = doc(db, 'files', fileId);
+
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    // doc.data() will be undefined in this case
+    return false;
+  }
+};

@@ -99,6 +99,12 @@
           );
           encryptAndUploadFile(lastFileData.filePassword, lastFileData.fileId);
         }
+        if (data.function === 'decryptWithPrivateKey') {
+          const fileData = data.data;
+          dbx.sharingGetSharedLinkFile({ url: fileData.fileUrl }).then((e) => {
+            decrypt(fileData.oldFileName, fileData.fileKey, e.result.fileBlob);
+          });
+        }
       });
       window.api.send('toMain', {
         function: 'getAccesToken',

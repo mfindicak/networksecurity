@@ -3,11 +3,28 @@ var currentMail = null;
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
+const shareFile = async (filePath, emails) => {
+  let members = [];
+  emails.forEach((element) => {
+    members.push({ email: element, '.tag': 'email' });
+  });
+  dbx
+    .sharingAddFileMember({
+      file: filePath,
+      members: members,
+      quiet: false,
+      access_level: { '.tag': 'viewer' },
+      add_message_as_comment: false,
+    })
+    .then((e) => console.log(e))
+    .catch((error) => console.log(error));
+};
+
 const fileSelected = async () => {
   let emailPublicKeys = [];
   const fileId = await window.createNewFileId();
   const filePassword = generateRandomPassword();
-  const sentToEmails = [currentMail]; //Su an icin yalnizca kendimle paylasicam
+  const sentToEmails = [currentMail, 'mertveflix3@gmail.com']; //Su an icin yalnizca kendimle paylasicam
   for (let index = 0; index < sentToEmails.length; index++) {
     const element = sentToEmails[index];
     let userPublicId = await window.getPublicIdOfUser(element);
@@ -30,6 +47,21 @@ const clearTheList = (listId) => {
   ourList.innerHTML = '';
 };
 
+const getSharingFileList = (listId) => {
+  dbx
+    .sharingListReceivedFiles({ limit: 100 })
+    .then(function (response) {
+      //console.log(response);
+      response.result.entries.forEach((element) => {
+        //console.log(element['.tag']);
+        addSharingFileElementToList(listId, element);
+      });
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
 const getFileList = (listId, path) => {
   clearTheList(listId);
   currentPath = path + '/';
@@ -45,6 +77,7 @@ const getFileList = (listId, path) => {
     .catch(function (error) {
       console.log(error);
     });
+  getSharingFileList('fileList');
 };
 
 const getAccesToken = async (lastAccesToken = null) => {
@@ -121,27 +154,40 @@ const encryptAndUploadFile = (key, encryptedName) => {
   reader.readAsArrayBuffer(file);
 };
 
-const decrypt = (fileName, file) => {
+const decrypt = (fileName, fileKey, file) => {
   var reader = new FileReader();
   reader.onload = () => {
-    var decrypted = CryptoJS.AES.decrypt(reader.result, key);
-    fileName = fileName
-      .replaceAll('xMl3Jk', '+')
-      .replaceAll('Por21Ld', '/')
-      .replaceAll('Ml32', '=');
-    var decryptedName = CryptoJS.AES.decrypt(fileName, key).toString(
-      CryptoJS.enc.Utf8
-    );
-    console.log(decryptedName);
+    var decrypted = CryptoJS.AES.decrypt(reader.result, fileKey);
     var typedArray = convertWordArrayToUint8Array(decrypted);
 
     var fileDec = new Blob([typedArray]);
     console.log(fileDec);
 
-    saveAsFile(decryptedName, fileDec);
+    saveAsFile(fileName, fileDec);
   };
   console.log(file);
   reader.readAsText(file);
+};
+
+const addSharingFileElementToList = (listId, element) => {
+  var ul = document.getElementById(listId);
+  var li = document.createElement('li');
+  var div = document.createElement('div');
+
+  var fileName = element.name + ' (Paylaşılan Dosya)';
+
+  li.appendChild(document.createTextNode(fileName));
+  div.appendChild(li);
+  var downloadButton = document.createElement('span');
+
+  li.classList.add('file');
+  downloadButton.addEventListener('click', () =>
+    downloadSharingFile(element.preview_url, element.name)
+  );
+  div.appendChild(downloadButton);
+
+  downloadButton.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i>';
+  ul.appendChild(div);
 };
 
 const addElementToList = (listId, element) => {
@@ -165,11 +211,17 @@ const addElementToList = (listId, element) => {
   li.appendChild(document.createTextNode(fileName));
   div.appendChild(li);
   var downloadButton = document.createElement('span');
+  var shareButton = document.createElement('span');
+  shareButton.innerHTML = '<i class="fa-solid fa-square-share-nodes"></i>';
+  shareButton.addEventListener('click', () =>
+    shareFile(element.path_display, ['mertveflix3@gmail.com'])
+  );
   if (element['.tag'] === 'file') {
     li.classList.add('file');
     downloadButton.addEventListener('click', () =>
       downloadFile(element.path_display, element.name)
     );
+    div.appendChild(shareButton);
     div.appendChild(downloadButton);
   } else {
     li.classList.add('folder');
@@ -180,6 +232,29 @@ const addElementToList = (listId, element) => {
 
   downloadButton.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i>';
   ul.appendChild(div);
+};
+
+const downloadSharingFile = async (url, fileName) => {
+  const fileData = await window.getFileDataIfExit(fileName);
+  console.log(fileData);
+  let fileKey = null;
+  for (let index = 0; index < fileData.encryptedPasswords.length; index++) {
+    const element = fileData.encryptedPasswords[index];
+    if (element.email === currentMail) {
+      fileKey = element.encryptedPassword;
+      console.log('Sifre Bulundu:' + fileKey);
+      break;
+    }
+  }
+  window.api.send('toMain', {
+    function: 'decryptWithPrivateKey',
+    fileData: {
+      fileId: fileName,
+      fileUrl: url,
+      oldFileName: fileData.oldFileName,
+      filePassword: fileKey,
+    },
+  });
 };
 
 const downloadFile = (path, fileName) => {
