@@ -95,6 +95,14 @@
             decrypt(fileData.oldFileName, fileData.fileKey, e.result.fileBlob);
           });
         }
+        if (data.function === 'decryptWithPrivateKeySelfFile') {
+          const fileData = data.data;
+          dbx.filesDownload({ path: fileData.filePath }).then((e) => {
+            console.log(e);
+            decrypt(fileData.oldFileName, fileData.fileKey, e.result.fileBlob);
+          });
+        }
+
         if (data.function === 'addNewUserForFile') {
           const fileData = data.data;
           shareFile(

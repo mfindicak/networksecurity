@@ -119,6 +119,18 @@ ipcMain.on('toMain', (event, args) => {
         },
       });
       break;
+    case 'decryptWithPrivateKeySelfFile':
+      win.webContents.send('fromMain', {
+        function: 'decryptWithPrivateKeySelfFile',
+        data: {
+          filePath: args.fileData.filePath,
+          oldFileName: args.fileData.oldFileName,
+          fileKey: String(
+            decryptWithPrivateKey(Buffer.from(args.fileData.filePassword))
+          ),
+        },
+      });
+      break;
     case 'addNewUserForFile':
       let newEncryptedPasswords = [];
       let decryptedKey = String(

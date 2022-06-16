@@ -317,9 +317,24 @@ const downloadSharingFile = async (url, fileName) => {
   });
 };
 
-const downloadFile = (path, fileName) => {
-  dbx.filesDownload({ path: path }).then((e) => {
-    decrypt(fileName, e.result.fileBlob);
+const downloadFile = async (path, fileName) => {
+  const fileData = await window.getFileDataIfExit(fileName);
+  let fileKey = null;
+  for (let index = 0; index < fileData.encryptedPasswords.length; index++) {
+    const element = fileData.encryptedPasswords[index];
+    if (element.email === currentMail) {
+      fileKey = element.encryptedPassword;
+      console.log('Sifre Bulundu:' + fileKey);
+      break;
+    }
+  }
+  window.api.send('toMain', {
+    function: 'decryptWithPrivateKeySelfFile',
+    fileData: {
+      filePath: path,
+      oldFileName: fileData.oldFileName,
+      filePassword: fileKey,
+    },
   });
 };
 
