@@ -119,6 +119,30 @@ ipcMain.on('toMain', (event, args) => {
         },
       });
       break;
+    case 'addNewUserForFile':
+      let newEncryptedPasswords = [];
+      let decryptedKey = String(
+        decryptWithPrivateKey(Buffer.from(args.fileData.fileKey))
+      );
+      args.fileData.emailPublicKeys.forEach((element) => {
+        newEncryptedPasswords.push({
+          email: element.email,
+          encryptedPassword: encryptWithPublicKey(
+            element.publicId,
+            decryptedKey
+          ).toJSON(),
+        });
+      });
+      win.webContents.send('fromMain', {
+        function: 'addNewUserForFile',
+        data: {
+          fileId: args.fileData.fileId,
+          filePath: args.fileData.filePath,
+          emails: args.fileData.emails,
+          encryptedPasswords: newEncryptedPasswords,
+        },
+      });
+      break;
     default:
   }
 });

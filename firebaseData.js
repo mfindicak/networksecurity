@@ -6,6 +6,7 @@ import {
   setDoc,
   doc,
   getDoc,
+  getDocs,
 } from 'https://www.gstatic.com/firebasejs/9.4.0/firebase-firestore.js';
 
 // TODO: Replace the following with your app's Firebase project configuration
@@ -113,4 +114,35 @@ window.getFileDataIfExit = async (fileId) => {
     // doc.data() will be undefined in this case
     return false;
   }
+};
+
+window.addUsersForFile = async (fileId, sentToEmails, encryptedPasswords) => {
+  console.log('burada');
+  let fileData = await window.getFileDataIfExit(fileId);
+  fileData.sentToEmails = fileData.sentToEmails.concat(sentToEmails);
+  fileData.encryptedPasswords =
+    fileData.encryptedPasswords.concat(encryptedPasswords);
+  console.log(fileData);
+
+  const files = collection(db, 'files');
+  try {
+    await setDoc(doc(files, fileId), fileData);
+    console.log('User Added.');
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+};
+
+window.getAllEmails = async () => {
+  let emails = [];
+  const querySnapshot = await getDocs(collection(db, 'emails'));
+  querySnapshot.forEach((doc) => {
+    emails.push(doc.id);
+  });
+  return emails;
+};
+
+window.getEmailsOfFile = async (fileId) => {
+  const fileData = await window.getFileDataIfExit(fileId);
+  return fileData.sentToEmails;
 };

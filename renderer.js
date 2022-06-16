@@ -1,11 +1,17 @@
 var dbx = null;
 var currentMail = null;
+var clickedElement = {};
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
-const shareFile = async (filePath, emails) => {
+const shareFile = async (
+  fileId,
+  filePath,
+  sentToEmails,
+  encryptedPasswords
+) => {
   let members = [];
-  emails.forEach((element) => {
+  sentToEmails.forEach((element) => {
     members.push({ email: element, '.tag': 'email' });
   });
   dbx
@@ -18,13 +24,47 @@ const shareFile = async (filePath, emails) => {
     })
     .then((e) => console.log(e))
     .catch((error) => console.log(error));
+  await window.addUsersForFile(fileId, sentToEmails, encryptedPasswords);
+  $('#shareModalCenter').modal('hide');
+};
+
+const shareFileDropbox = async () => {
+  let sentToEmails = $('#shareSelect').val();
+  if (sentToEmails.length > 0) {
+    let emailPublicKeys = [];
+    console.log(clickedElement);
+    const fileData = await window.getFileDataIfExit(clickedElement.name);
+    for (let index = 0; index < sentToEmails.length; index++) {
+      const element = sentToEmails[index];
+      let userPublicId = await window.getPublicIdOfUser(element);
+      emailPublicKeys.push({ email: element, publicId: userPublicId });
+    }
+    for (let index = 0; index < fileData.encryptedPasswords.length; index++) {
+      const element = fileData.encryptedPasswords[index];
+      if (element.email === currentMail) {
+        fileKey = element.encryptedPassword;
+        break;
+      }
+    }
+
+    window.api.send('toMain', {
+      function: 'addNewUserForFile',
+      fileData: {
+        fileId: clickedElement.name,
+        filePath: clickedElement.path_display,
+        emails: sentToEmails,
+        fileKey: fileKey,
+        emailPublicKeys: emailPublicKeys,
+      },
+    });
+  }
 };
 
 const fileSelected = async () => {
   let emailPublicKeys = [];
   const fileId = await window.createNewFileId();
   const filePassword = generateRandomPassword();
-  const sentToEmails = [currentMail, 'mertveflix3@gmail.com']; //Su an icin yalnizca kendimle paylasicam
+  const sentToEmails = [currentMail]; //Su an icin yalnizca kendimle paylasicam
   for (let index = 0; index < sentToEmails.length; index++) {
     const element = sentToEmails[index];
     let userPublicId = await window.getPublicIdOfUser(element);
@@ -213,8 +253,28 @@ const addElementToList = (listId, element) => {
   var downloadButton = document.createElement('span');
   var shareButton = document.createElement('span');
   shareButton.innerHTML = '<i class="fa-solid fa-square-share-nodes"></i>';
-  shareButton.addEventListener('click', () =>
-    shareFile(element.path_display, ['mertveflix3@gmail.com'])
+  shareButton.addEventListener('click', async () =>
+    // shareFileDropbox(element.path_display, element.name)
+    {
+      document.getElementById('shareModalCenterBody').innerHTML = '';
+      clickedElement = element;
+      let allEmails = await window.getAllEmails();
+      let sharedEmails = await window.getEmailsOfFile(fileName);
+      let selectDiv = document.createElement('select');
+      selectDiv.id = 'shareSelect';
+      selectDiv.className = 'container-fluid';
+      selectDiv.multiple = true;
+      allEmails.forEach((element) => {
+        let anOption = document.createElement('option');
+        if (sharedEmails.includes(element)) anOption.disabled = true;
+        anOption.value = element;
+        anOption.innerHTML = element;
+        selectDiv.appendChild(anOption);
+      });
+
+      document.getElementById('shareModalCenterBody').append(selectDiv);
+      $('#shareModalCenter').modal('show');
+    }
   );
   if (element['.tag'] === 'file') {
     li.classList.add('file');
