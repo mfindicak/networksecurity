@@ -40,13 +40,12 @@ const db = getFirestore(app);
 //   }
 // };
 
-window.addEmail = async (email, publicKey, privateKey) => {
+window.addEmail = async (email, publicKey) => {
   const emails = collection(db, 'emails');
   try {
     await setDoc(doc(emails, email), {
       email: email,
       publicKey: publicKey,
-      privateKey: privateKey,
     });
   } catch (e) {
     console.error('Error adding document: ', e);

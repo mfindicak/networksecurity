@@ -44,14 +44,6 @@
     />
 
     <link rel="stylesheet" href="style.css" />
-
-    <script>
-      $(document).ready(function () {
-        if (accesToken === null) {
-          $('#exampleModal').modal('show');
-        }
-      });
-    </script>
     <script type="text/javascript">
       function modalHide() {
         $('#exampleModal').modal('hide');
@@ -64,10 +56,18 @@
       let thePrivateKey = null;
       window.api.receive('fromMain', (data) => {
         console.log(`Received ${JSON.stringify(data)} from main process`);
+
         if (data.function === 'getAccesToken') {
           accesToken = JSON.parse(data.data).accesToken;
           console.log('My Acces Token: ' + accesToken);
+          if (!accesToken) {
+            $('#exampleModal').modal('show');
+            window.open(appTokenUrl, '_blank').focus();
+          } else {
+            getAccesToken(accesToken);
+          }
         }
+
         if (data.function === 'getPublicKey') {
           thePublicKey = data.data;
         }

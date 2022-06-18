@@ -77,11 +77,17 @@ ipcMain.on('toMain', (event, args) => {
       break;
     case 'getAccesToken':
       fs.readFile('accesToken.json', 'utf8', (error, data) => {
-        // Send result back to renderer process
-        win.webContents.send('fromMain', {
-          function: 'getAccesToken',
-          data: data,
-        });
+        if (error) {
+          win.webContents.send('fromMain', {
+            function: 'getAccesToken',
+            data: JSON.stringify({ accesToken: false }),
+          });
+        } else {
+          win.webContents.send('fromMain', {
+            function: 'getAccesToken',
+            data: data,
+          });
+        }
       });
       break;
     case 'encryptWithPublicKey':

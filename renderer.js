@@ -160,21 +160,13 @@ const getAccesToken = async (lastAccesToken = null) => {
 
   dbx.usersGetCurrentAccount().then((e) => {
     currentMail = e.result.email;
-    addEmail(currentMail, thePublicKey, thePrivateKey);
+    window.addEmail(currentMail, thePublicKey);
   });
 
   getFileList('fileList', '');
   document.getElementById('tokenContainer').style = 'display:none';
   return myAccessToken;
 };
-
-$(document).ready(function () {
-  if (accesToken === null) {
-    window.open(appTokenUrl, '_blank').focus();
-  } else {
-    getAccesToken(accesToken);
-  }
-});
 
 var currentPath = '/';
 
