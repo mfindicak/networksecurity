@@ -4,6 +4,30 @@ var clickedElement = {};
 const appTokenUrl =
   'https://www.dropbox.com/oauth2/authorize?client_id=2h5lnsd8852z1u9&response_type=code';
 
+const findRealFileName = (fileId) => {
+  let realFileName = false;
+  for (let index = 0; index < allFiles.length; index++) {
+    const e = allFiles[index];
+    if (e.fileId === fileId) {
+      realFileName = e.oldFileName;
+      break;
+    }
+  }
+  return realFileName;
+};
+
+const findFileId = (oldFileName) => {
+  let fileId = false;
+  for (let index = 0; index < allFiles.length; index++) {
+    const e = allFiles[index];
+    if (e.oldFileName === oldFileName) {
+      fileId = e.fileId;
+      break;
+    }
+  }
+  return fileId;
+};
+
 const shareFile = async (
   fileId,
   filePath,
@@ -163,6 +187,7 @@ const getAccesToken = async (lastAccesToken = null) => {
     window.addEmail(currentMail, thePublicKey);
   });
 
+  window.getAllFiles().then((e) => (allFiles = e));
   getFileList('fileList', '');
   document.getElementById('tokenContainer').style = 'display:none';
   return myAccessToken;
@@ -182,6 +207,7 @@ const encryptAndUploadFile = (key, encryptedName) => {
     fileEnc.name = encryptedName;
     console.log(fileEnc);
     uploadFile(fileEnc);
+    window.getAllFiles().then((e) => (allFiles = e));
   };
   reader.readAsArrayBuffer(file);
 };
@@ -206,7 +232,15 @@ const addSharingFileElementToList = (listId, element) => {
   var li = document.createElement('li');
   var div = document.createElement('div');
 
-  var fileName = element.name + ' (Paylaşılan Dosya)';
+  var fileName = element.name;
+  if (
+    document.getElementById('myCheck').checked &&
+    element['.tag'] === 'file'
+  ) {
+    fileName = findRealFileName(fileName);
+  }
+
+  fileName = fileName + ' (Paylaşılan Dosya)';
 
   li.appendChild(document.createTextNode(fileName));
   div.appendChild(li);
@@ -233,11 +267,7 @@ const addElementToList = (listId, element) => {
     document.getElementById('myCheck').checked &&
     element['.tag'] === 'file'
   ) {
-    fileName = fileName
-      .replaceAll('xMl3Jk', '+')
-      .replaceAll('Por21Ld', '/')
-      .replaceAll('Ml32', '=');
-    fileName = CryptoJS.AES.decrypt(fileName, key).toString(CryptoJS.enc.Utf8);
+    fileName = findRealFileName(fileName);
   }
 
   li.appendChild(document.createTextNode(fileName));
@@ -474,7 +504,7 @@ const convertWordArrayToUint8Array = (wordArray) => {
 };
 
 const changedSwitch = () => {
-  const folders = document.getElementsByClassName('folder');
+  // const folders = document.getElementsByClassName('folder');
   const files = document.getElementsByClassName('file');
   if (document.getElementById('myCheck').checked) {
     console.log('checked');
@@ -490,11 +520,8 @@ const changedSwitch = () => {
     } */
     for (let data of files) {
       var name = data.innerText;
-      name = name
-        .replaceAll('xMl3Jk', '+')
-        .replaceAll('Por21Ld', '/')
-        .replaceAll('Ml32', '=');
-      var name = CryptoJS.AES.decrypt(name, key).toString(CryptoJS.enc.Utf8);
+      name = name.replace(' (Paylaşılan Dosya)', '');
+      name = findRealFileName(name);
       data.innerText = name;
     }
   } else {
@@ -502,13 +529,8 @@ const changedSwitch = () => {
     document.getElementById('encryptLabel').innerText = 'Şifreli';
     for (let data of files) {
       var name = data.innerText;
-      console.log(name);
-      var name = CryptoJS.AES.encrypt(name, key)
-        .toString()
-        .replaceAll('+', 'xMl3Jk')
-        .replaceAll('/', 'Por21Ld')
-        .replaceAll('=', 'Ml32');
-      console.log(name);
+      console.log(data);
+      name = findFileId(name);
       data.innerText = name;
     }
   }

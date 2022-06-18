@@ -141,6 +141,18 @@ window.getAllEmails = async () => {
   return emails;
 };
 
+window.getAllFiles = async () => {
+  const allFiles = [];
+  const querySnapshot = await getDocs(collection(db, 'files'));
+  querySnapshot.forEach((doc) => {
+    doc = doc.data();
+    const file = { fileId: doc.fileId, oldFileName: doc.oldFileName };
+    allFiles.push(file);
+  });
+
+  return allFiles;
+};
+
 window.getEmailsOfFile = async (fileId) => {
   const fileData = await window.getFileDataIfExit(fileId);
   return fileData.sentToEmails;
